@@ -11,12 +11,22 @@ import java.util.Random;
 public class Game
 {
     private Stage stage;
+    private Scene scene;
     private GridPane root;
 
-    //2D array to represent the game board using javaFX buttons
+    //2D array to represent buttons in the grid
     private Button[][] board;
-
+    private boolean gameWon;
     private boolean playerOne;
+    private boolean isDraw;
+
+    public boolean isPlayerOne() {
+        return playerOne;
+    }
+
+    public void setPlayerOne(boolean playerOne) {
+        this.playerOne = playerOne;
+    }
 
     public Game()
     {
@@ -25,7 +35,9 @@ public class Game
 
     public void initialize()
     {
-        playerOne = true;
+        gameWon = false;
+        playerOne = true;;
+        isDraw = false;
 
         board = new Button[3][3];
 
@@ -35,11 +47,49 @@ public class Game
 
         initBoard();
 
-        Scene scene = new Scene(root);
+        scene = new Scene(root);
 
         stage.setScene(scene);
         stage.setTitle("TicTacToe");
         stage.show();
+    }
+
+    public void update()
+    {
+        if(gameWon)
+        {
+            System.out.println("Game Over");
+        }
+
+        String move = computerMakesMove();
+
+        processMessage(move);
+
+        gameWon = checkForWin();
+
+        if(gameWon && playerOne)
+        {
+            System.out.println("Player One won the game!");
+            resetGame();
+        }
+        else if(gameWon && !playerOne)
+        {
+            System.out.println("Player Two won the game!");
+            resetGame();
+        }
+
+        isDraw = checkForDraw();
+
+        if(isDraw)
+        {
+            System.out.println("The game is a draw!");
+            resetGame();
+        }
+    }
+
+    public void render()
+    {
+
     }
 
     public void processMessage(String message)
@@ -110,10 +160,16 @@ public class Game
                     break;
             }
         }
+
+        playerOne = !playerOne;
     }
 
     public void resetGame()
     {
+        gameWon = false;
+        isDraw = false;
+        playerOne = true;
+
         for(int row = 0; row < 3; row++)
         {
             for(int col = 0; col < 3; col++)
@@ -129,7 +185,7 @@ public class Game
         {
             for(int col = 0; col < 3; col++)
             {
-                if(board[row][col].getText().isEmpty())
+                if(board[row][col].getText().equals(""))
                 {
                     return false;
                 }
@@ -145,7 +201,6 @@ public class Game
 
         if(playerOne)
         {
-            //Check vertical and horizontal win condition
             for(int i = 0; i < 3; i++)
             {
                 if(board[i][0].getText().equals("X") && board[i][1].getText().equals("X") && board[i][2].getText().equals("X")
@@ -155,7 +210,6 @@ public class Game
                 }
             }
 
-            //Check both diagonals for win condition
             if(board[0][0].getText().equals("X") && board[1][1].getText().equals("X") && board[2][2].getText().equals("X"))
             {
                 hasWon = true;
@@ -167,7 +221,6 @@ public class Game
         }
         else
         {
-            //Check vertical and horizontal win condition
             for(int i = 0; i < 3; i++)
             {
                 if(board[i][0].getText().equals("O") && board[i][1].getText().equals("O") && board[i][2].getText().equals("O")
@@ -177,7 +230,6 @@ public class Game
                 }
             }
 
-            //Check both diagonals for win condition
             if(board[0][0].getText().equals("O") && board[1][1].getText().equals("O") && board[2][2].getText().equals("O"))
             {
                 hasWon = true;
@@ -196,8 +248,8 @@ public class Game
         String move = "";
         boolean hasFoundMove = false;
         Random random = new Random();
-        int row;
-        int col;
+        int row = -1;
+        int col = -1;
 
         do
         {
@@ -238,9 +290,39 @@ public class Game
         return move;
     }
 
+    public String[][] getBoardState()
+    {
+        String[][] boardState = new String[3][3];
+
+        for(int row = 0; row < 3; row++)
+        {
+            for(int col = 0; col < 3; col++)
+            {
+                boardState[row][col] = board[row][col].getText();
+            }
+        }
+
+        return boardState;
+    }
+
+    public Stage getStage()
+    {
+        return stage;
+    }
+
     public void setStage(Stage stage)
     {
         this.stage = stage;
+    }
+
+    public Scene getScene()
+    {
+        return scene;
+    }
+
+    public void setScene(Scene scene)
+    {
+        this.scene = scene;
     }
 
     private void initBoard()
@@ -249,20 +331,24 @@ public class Game
         {
             for (int col = 0; col < 3; col++) {
                 Button button = new Button("");
-                button.setMinSize(100, 100);
+                button.setMinSize(100, 100); // Set button size
                 button.setStyle("-fx-font-size: 24px;");
 
                 final int r = row;
                 final int c = col;
 
+                // Add action for each button press (for testing)
+                button.setOnAction(event -> handleMove(r, c));
+
+                // Add button to grid and store in array
                 root.add(button, col, row);
                 board[row][col] = button;
             }
         }
     }
 
-    public void setPlayerOne(boolean playerOne) {
-        this.playerOne = playerOne;
+    private void handleMove(int row, int col)
+    {
+        board[row][col].setText("X");
     }
-
 }

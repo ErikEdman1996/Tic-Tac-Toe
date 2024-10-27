@@ -8,11 +8,17 @@ public class GameClient extends Application
 {
     private Game game;
     private SocketClient socketClient;
+    private String[][] localBoard;
     private static final long MOVE_DELAY = 1_000_000_000; //1 second in nanoseconds
     private long lastMoveTime;
     private String messageToServer;
 
     private boolean myTurn = false;
+
+    public void startGame()
+    {
+        myTurn = false;
+    }
 
     public static void main(String[] args)
     {
@@ -27,6 +33,9 @@ public class GameClient extends Application
         game.initialize();
         game.setPlayerOne(false);
 
+        localBoard = new String[3][3];
+        localBoard = game.getBoardState();
+
         socketClient = new SocketClient();
         socketClient.initialize("localhost", 6667);
 
@@ -39,7 +48,7 @@ public class GameClient extends Application
             @Override
             public void handle(long now)
             {
-                String messageFromServer;
+                String messageFromServer = "";
 
                 if(now - lastMoveTime > MOVE_DELAY)
                 {

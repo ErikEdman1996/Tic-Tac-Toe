@@ -1,3 +1,5 @@
+import com.sun.security.ntlm.Server;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,7 +33,7 @@ public class SocketServer
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            System.out.println(e);
         }
         finally
         {
@@ -57,6 +59,24 @@ public class SocketServer
 
     }
 
+    private void handleClient(Socket socket)
+    {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);)
+        {
+            String message;
+
+            while((message = reader.readLine()) != null)
+            {
+                System.out.println("Server received message from client: " + message);
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.println(e);
+        }
+    }
+
     public String processMessage() throws IOException
     {
         String messageFromClient = null;
@@ -73,7 +93,7 @@ public class SocketServer
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                System.out.println(e);
             }
         }
 

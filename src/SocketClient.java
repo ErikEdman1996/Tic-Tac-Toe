@@ -7,6 +7,7 @@ import java.net.Socket;
 public class SocketClient
 {
 
+    private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
 
@@ -16,7 +17,7 @@ public class SocketClient
 
         try
         {
-            Socket socket = new Socket(host, port);
+            socket = new Socket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("Connected to Server!");
@@ -32,7 +33,6 @@ public class SocketClient
         if(out != null)
         {
             out.println(message);
-            System.out.println("Sent to server: " + message);
         }
         else
         {
@@ -62,5 +62,19 @@ public class SocketClient
        }
 
         return messageFromServer;
+    }
+
+    private void handleServerCommunication(Socket socket)
+    {
+        String message = "Hey";
+
+        try
+        {
+            sendMessageToServer(message);
+        }
+        catch (IOException e)
+        {
+            System.out.println(e);
+        }
     }
 }

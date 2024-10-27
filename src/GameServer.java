@@ -3,13 +3,16 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public class GameServer extends Application
 {
     private Game game;
+    private String[][] localBoard;
     private static final long MOVE_DELAY = 1_000_000_000; //1 second in nanoseconds
     private long lastMoveTime;
     private SocketServer socketServer;
+    private String messageFromClient;
     private String messageToClient;
 
     private boolean myTurn = true;
@@ -26,6 +29,9 @@ public class GameServer extends Application
         game.setStage(primaryStage);
         game.initialize();
 
+        localBoard = new String[3][3];
+        localBoard = game.getBoardState();
+
         lastMoveTime = 0;
 
         socketServer = new SocketServer();
@@ -38,7 +44,7 @@ public class GameServer extends Application
             {
                 if(now - lastMoveTime > MOVE_DELAY)
                 {
-                    String messageFromClient;
+                    String messageFromClient = "";
 
                     if(!myTurn)
                     {
@@ -49,7 +55,7 @@ public class GameServer extends Application
 
                             if(game.checkForWin())
                             {
-                                System.out.println("Client Wins!");
+                                System.out.println("Server Wins!");
                                 game.resetGame();
                             }
                             else if(game.checkForDraw())
@@ -78,7 +84,7 @@ public class GameServer extends Application
 
                             if(game.checkForWin())
                             {
-                                System.out.println("Server Wins!");
+                                System.out.println("Client Wins!");
                                 game.resetGame();
                             }
                             else if(game.checkForDraw())
