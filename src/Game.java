@@ -110,8 +110,6 @@ public class Game
                     break;
             }
         }
-
-        playerOne = !playerOne;
     }
 
     public void resetGame()
